@@ -15,20 +15,20 @@ def index():
         include_symbols = 'symbols' in request.form
         include_numbers = 'numbers' in request.form
 
-        char_pool = ''
+        characters = ''
         if include_letters:
-            char_pool += string.ascii_letters
+            characters += string.ascii_letters
         if include_symbols:
-            char_pool += '!@#$%^&*()-_=+[]{}<>?/|'
+            characters += '!@#$%^&*()-_=+[]{}<>?/|'
         if include_numbers:
-            char_pool += string.digits
+            characters += string.digits
 
-        if not char_pool:
+        if not characters:
             error = 'Please select at least one character type.'
         elif length <= 0:
-            error = 'Password length must be greater than 0.'
+            error = 'Please enter a valid password length.'
         else:
-            password = ''.join(random.choice(char_pool) for _ in range(length))
+            password = ''.join(random.choices(characters, k=length))
 
     return render_template('index.html', password=password, error=error)
 
