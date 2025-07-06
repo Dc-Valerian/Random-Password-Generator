@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Beautiful Password Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='password.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Beautiful Password Generator</h1>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form id="password-form" method="POST">
+            <div class="input-group">
+                <label for="length">Password Length:</label>
+                <input type="number" id="length" name="length" min="1" required>
+            </div>
+
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" name="letters" checked>
+                    Include Letters (A-Z, a-z)
+                </label>
+                <label>
+                    <input type="checkbox" name="symbols">
+                    Include Symbols (!@#$...)
+                </label>
+                <label>
+                    <input type="checkbox" name="numbers">
+                    Include Numbers (0-9)
+                </label>
+            </div>
+
+            <div class="button-group">
+                <button type="submit">✨ Generate</button>
+                <button type="button" id="reset-btn">🔄 Reset</button>
+            </div>
+        </form>
+
+        {% if password %}
+            <div class="result">
+                <h2>Your Password:</h2>
+                <div class="password-box">
+                    <span id="password-text">{{ password }}</span>
+                    <button id="copy-btn">Copy</button>
+                </div>
+                <div id="strength-meter" class="strength-meter">
+                    <span id="strength-text">Strength: </span>
+                    <div id="strength-bar" class="bar"></div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        const copyBtn = document.getElementById('copy-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const passwordText = document.getElementById('password-text');
+        const strengthBar = document.getElementById('strength-bar');
+        const strengthText = document.getElementById('strength-text');
+
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(passwordText.innerText);
+                copyBtn.innerText = 'Copied!';
+                setTimeout(() => copyBtn.innerText = 'Copy', 1500);
+            });
+
+            const password = passwordText.innerText;
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password) && /[a-z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[!@#$%^&*()\-_=+\[\]{}<>?/|]/.test(password)) strength++;
+
+            if (strength <= 1) {
+                strengthBar.style.background = '#ff4d4d';
+                strengthBar.style.width = '33%';
+                strengthText.innerText = 'Strength: Weak';
+            } else if (strength === 2 || strength === 3) {
+                strengthBar.style.background = '#f39c12';
+                strengthBar.style.width = '66%';
+                strengthText.innerText = 'Strength: Medium';
+            } else {
+                strengthBar.style.background = '#2ecc71';
+                strengthBar.style.width = '100%';
+                strengthText.innerText = 'Strength: Strong';
+            }
+        }
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                document.getElementById('length').value = '';
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                window.location.href = '/';
+            });
+        }
+    </script>
+</body>
+</html>

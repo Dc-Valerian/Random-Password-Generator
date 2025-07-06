@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: password-generator
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
